@@ -11,7 +11,6 @@ import { Queue } from "./queue.js";
 const api = new APIWrapper();
 let queue = new Queue();
 api.setEventHandler((events) => {
-  console.log(queue.size());
   if (queue.size() == 0) {
     events.map((e) => {
       queue.enqueue(e);
@@ -21,7 +20,6 @@ api.setEventHandler((events) => {
   }
 });
 function startQueue() {
-  console.log(queue.items);
   queue.items.map((e, i) => {
     if (e.type == API_EVENT_TYPE.MESSAGE) {
       addMessage(e);
