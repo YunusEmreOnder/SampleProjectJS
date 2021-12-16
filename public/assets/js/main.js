@@ -10,28 +10,30 @@ import { Queue } from "./queue.js";
 
 const api = new APIWrapper();
 let queue = new Queue();
+let sendedGift = false;
+
 api.setEventHandler((events) => {
-  if (queue.size() == 0) {
-    events.map((e) => {
-      queue.enqueue(e);
-    });
-  } else {
-    startQueue();
-  }
-});
-function startQueue() {
-  queue.items.map((e, i) => {
-    if (e.type == API_EVENT_TYPE.MESSAGE) {
-      addMessage(e);
-      queue.dequeue();
-    } else if (e.type == API_EVENT_TYPE.ANIMATED_GIFT) {
-      if (isPossiblyAnimatingGift()) return;
-      animateGift(e);
-      queue.dequeue();
-    } else {
-      addMessage(e);
-      queue.dequeue();
-    }
+  events.map((e, i) => {
+    queue.enqueue(e);
   });
+});
+
+function startQueue() {
+  if (queue.size() == 0) return;
+  let data = queue.dequeue();
+  if (data.type == API_EVENT_TYPE.MESSAGE) {
+    addMessage(data);
+    sendedGift = false;
+  } else if (data.type == API_EVENT_TYPE.ANIMATED_GIFT) {
+    if (isPossiblyAnimatingGift()) return;
+    animateGift(data);
+    sendedGift = false;
+  } else {
+    if (!sendedGift) addMessage(data);
+    sendedGift = true;
+  }
 }
+setInterval(() => {
+  startQueue();
+}, 500);
 // NOTE: UI helper methods from `dom_updates` are already imported above.
