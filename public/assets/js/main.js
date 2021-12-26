@@ -13,7 +13,16 @@ let queue = new Queue();
 let sendedGift = false;
 
 api.setEventHandler((events) => {
-  events.map((e, i) => {
+  const seen = new Set();
+  const filteredArr = events.filter(filterEl => {
+    const duplicate = seen.has(filterEl.id);
+    seen.add(filterEl.id);
+    return !duplicate;
+  });
+  filteredArr.map((e, i) => {
+    if(e.type == API_EVENT_TYPE.ANIMATED_GIFT)
+    queue.firstenqueue(e);
+    else
     queue.enqueue(e);
   });
 });
