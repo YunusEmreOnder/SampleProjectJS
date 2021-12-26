@@ -30,6 +30,7 @@ api.setEventHandler((events) => {
 function startQueue() {
   if (queue.size() == 0) return;
   let data = queue.dequeue();
+  if (getSecondDifference(data.timestamp) > 20) return;
   if (data.type == API_EVENT_TYPE.MESSAGE) {
     addMessage(data);
     sendedGift = false;
@@ -45,4 +46,12 @@ function startQueue() {
 setInterval(() => {
   startQueue();
 }, 500);
-// NOTE: UI helper methods from `dom_updates` are already imported above.
+
+function getSecondDifference(date) {
+  var t1 = new Date(date);
+  var t2 = new Date();
+  var dif = t1.getTime() - t2.getTime();
+  var t1ToT2 = dif / 1000;
+  var between_Dates = Math.abs(t1ToT2);
+  return Number(between_Dates.toFixed(0));
+}
